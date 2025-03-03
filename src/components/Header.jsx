@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import Nav from './Nav';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import d20 from '../img/d20.png';
 import { useView } from '../context/ViewContext';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 function Header() {
     const { showPublisher, toggleView } = useView();
     const [isSigningOut, setIsSigningOut] = useState(false);
+    const navigate = useNavigate();
 
     const handleSignOut = async (e) => {
         e.preventDefault(); // Prevent any default behavior
@@ -16,26 +17,30 @@ function Header() {
 
         setIsSigningOut(true);
         try {
-            alert('Starting sign out...'); // Debug alert
+            // First try to get the current session
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            // Attempt to sign out
             const { error } = await supabase.auth.signOut();
-            alert('Sign out response received'); // Debug alert
 
             if (error) {
-                alert(`Sign out error: ${JSON.stringify(error)}`); // Debug alert
+                // If we get an AuthSessionMissingError, the session is already gone
+                // so we can consider this a successful sign-out
+                if (error.name === 'AuthSessionMissingError' || !session) {
+                    toast.success('Signed out successfully');
+                    navigate('/');
+                    return;
+                }
                 throw error;
             }
 
-            // Add a small delay to ensure state updates are processed
-            await new Promise((resolve) => setTimeout(resolve, 500));
             toast.success('Signed out successfully');
+            navigate('/');
         } catch (error) {
-            alert(
-                `Detailed error: ${JSON.stringify({
-                    message: error.message,
-                    name: error.name,
-                })}`
-            ); // Debug alert
-            toast.error(`Sign out failed: ${error.message}`);
+            console.error('Sign out error:', error);
+            toast.error('Unable to sign out. Please try closing and reopening the app.');
         } finally {
             setIsSigningOut(false);
         }

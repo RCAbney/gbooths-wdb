@@ -6,7 +6,7 @@ import d20 from '../img/d20.png';
 function AuthContainer() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-200">
-            <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
+            <div className="max-w-md mx-4 sm:mx-0 w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
                 <div className="flex items-center justify-center gap-4 mb-8">
                     <img
                         src={d20}

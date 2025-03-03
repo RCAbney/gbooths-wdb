@@ -8,6 +8,7 @@ import { supabase } from './lib/supabase';
 import Home from './routes/Home';
 import AllBooths from './routes/AllBooths';
 import AuthContainer from './components/AuthContainer';
+import { ViewProvider } from './context/ViewContext';
 
 const queryClient = new QueryClient();
 
@@ -39,13 +40,15 @@ function App() {
         return (
             <QueryClientProvider client={queryClient}>
                 <ReactQueryDevtools initialIsOpen={false} />
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<AllBooths userId={session.user.id} />} />
-                        <Route element={<Home userId={session.user.id} />} path="/all-booths" />
-                    </Routes>
-                </BrowserRouter>
-                <ToastContainer position="top-center" autoClose={750} />
+                <ViewProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<AllBooths userId={session.user.id} />} />
+                            <Route element={<Home userId={session.user.id} />} path="/all-booths" />
+                        </Routes>
+                    </BrowserRouter>
+                    <ToastContainer position="top-center" autoClose={750} />
+                </ViewProvider>
             </QueryClientProvider>
         );
     }

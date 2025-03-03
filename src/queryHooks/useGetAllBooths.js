@@ -87,6 +87,11 @@ const fetchFavorites = async (userId) => {
         return acc;
     }, {});
 
+    // Sort titles alphabetically within each publisher group
+    Object.values(groupedByPublisher).forEach((group) => {
+        group.titles.sort((a, b) => a.title.localeCompare(b.title));
+    });
+
     return Object.values(groupedByPublisher);
 };
 

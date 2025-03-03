@@ -2,8 +2,11 @@ import { supabase } from '../lib/supabase';
 import Nav from './Nav';
 import { Link } from 'react-router-dom';
 import d20 from '../img/d20.png';
+import { useView } from '../context/ViewContext';
 
 function Header() {
+    const { showPublisher, toggleView } = useView();
+
     const handleSignOut = async () => {
         try {
             const { error } = await supabase.auth.signOut();
@@ -14,33 +17,39 @@ function Header() {
     };
 
     return (
-        <header className="bg-white shadow-sm">
-            <div className="sticky top-0">
-                <div className="flex items-center justify-between bg-black p-4">
-                    <div className="flex-1 min-w-0">
-                        <h2 className="text-xl font-bold leading-7 text-white sm:truncate">
-                            <Link to="/" className="flex gap-3">
-                                <img
-                                    src={d20}
-                                    alt="GBooths app"
-                                    width="30"
-                                    height="30"
-                                    style={{ filter: 'brightness(0) invert(1)' }}
-                                />{' '}
-                                GBooths
-                            </Link>
-                        </h2>
-                    </div>
-                    <div className="flex md:mt-0 md:ml-4 gap-4">
-                        <button
-                            onClick={handleSignOut}
-                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
-                        >
-                            Sign Out
-                        </button>
-                    </div>
+        <header className="bg-white shadow-sm sticky top-0">
+            <div className="flex items-center justify-between bg-black p-4">
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-bold leading-7 text-white sm:truncate">
+                        <Link to="/" className="flex gap-3">
+                            <img
+                                src={d20}
+                                alt="GBooths app"
+                                width="30"
+                                height="30"
+                                style={{ filter: 'brightness(0) invert(1)' }}
+                            />{' '}
+                            GBooths
+                        </Link>
+                    </h2>
                 </div>
-                <div className="flex items-center justify-around bg-black p-4">
+                <div className="flex md:mt-0 md:ml-4 gap-4">
+                    <button
+                        onClick={handleSignOut}
+                        className="inline-flex items-center px-2 py-1 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                    >
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+            <div className="flex items-center justify-between bg-black p-4">
+                <button
+                    onClick={toggleView}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                >
+                    {showPublisher ? 'Publisher' : 'Location'}
+                </button>
+                <div className="flex items-center justify-around sm:justify-end gap-4">
                     <Link
                         to="/"
                         className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"

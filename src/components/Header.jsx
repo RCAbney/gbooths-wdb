@@ -16,12 +16,26 @@ function Header() {
 
         setIsSigningOut(true);
         try {
+            alert('Starting sign out...'); // Debug alert
             const { error } = await supabase.auth.signOut();
-            if (error) throw error;
+            alert('Sign out response received'); // Debug alert
+
+            if (error) {
+                alert(`Sign out error: ${JSON.stringify(error)}`); // Debug alert
+                throw error;
+            }
+
+            // Add a small delay to ensure state updates are processed
+            await new Promise((resolve) => setTimeout(resolve, 500));
             toast.success('Signed out successfully');
         } catch (error) {
-            console.error('Error signing out:', error.message);
-            toast.error('Failed to sign out. Please try again.');
+            alert(
+                `Detailed error: ${JSON.stringify({
+                    message: error.message,
+                    name: error.name,
+                })}`
+            ); // Debug alert
+            toast.error(`Sign out failed: ${error.message}`);
         } finally {
             setIsSigningOut(false);
         }

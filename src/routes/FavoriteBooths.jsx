@@ -4,12 +4,13 @@ import Booth from '../components/Booth';
 import NoBooths from '../components/NoBooths';
 import Loading from '../components/Loading';
 import { useFavorites } from '../queryHooks/useGetAllBooths';
-import { useView } from '../context/ViewContext';
+import { ViewContext } from '../context/ViewContext';
 import { sortBooths } from '../helperFns/sortBooths';
+import { useContext } from 'react';
 
 function FavoriteBooths({ userId }) {
     const { data: boothData, isLoading, error } = useFavorites(userId);
-    const { showPublisher } = useView();
+    const { showPublisher } = useContext(ViewContext);
 
     if (isLoading) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;

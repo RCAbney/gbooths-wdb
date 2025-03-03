@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ViewContext } from '../context/viewContext';
+import { ViewContext } from '../context/ViewContext';
 
 export function useView() {
     const context = useContext(ViewContext);

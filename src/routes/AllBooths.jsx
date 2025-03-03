@@ -3,12 +3,13 @@ import Layout from '../components/Layout';
 import Booth from '../components/Booth';
 import Loading from '../components/Loading';
 import { useGetAllBooths } from '../queryHooks/useGetAllBooths';
-import { useView } from '../context/ViewContext';
+import { ViewContext } from '../context/ViewContext';
 import { sortBooths } from '../helperFns/sortBooths';
+import { useContext } from 'react';
 
 function AllBooths({ userId }) {
     const { data: boothData, isLoading, error } = useGetAllBooths(userId);
-    const { showPublisher } = useView();
+    const { showPublisher } = useContext(ViewContext);
 
     if (isLoading) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;

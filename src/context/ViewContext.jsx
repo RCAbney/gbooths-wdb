@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { ViewContext } from './viewContext';
+
+const ViewContext = createContext();
 
 export function ViewProvider({ children }) {
     const [showPublisher, setShowPublisher] = useState(() => {
@@ -28,3 +29,5 @@ export function ViewProvider({ children }) {
 ViewProvider.propTypes = {
     children: PropTypes.node.isRequired,
 };
+
+export { ViewContext };

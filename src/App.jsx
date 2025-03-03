@@ -5,7 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { supabase } from './lib/supabase';
-import Home from './routes/Home';
+import FavoriteBooths from './routes/FavoriteBooths';
 import AllBooths from './routes/AllBooths';
 import AuthContainer from './components/AuthContainer';
 import { ViewProvider } from './context/ViewContext';
@@ -44,7 +44,10 @@ function App() {
                     <BrowserRouter>
                         <Routes>
                             <Route path="/" element={<AllBooths userId={session.user.id} />} />
-                            <Route element={<Home userId={session.user.id} />} path="/all-booths" />
+                            <Route
+                                element={<FavoriteBooths userId={session.user.id} />}
+                                path="/favorite-booths"
+                            />
                         </Routes>
                     </BrowserRouter>
                     <ToastContainer position="top-center" autoClose={750} />

@@ -7,7 +7,7 @@ import { useFavorites } from '../queryHooks/useGetAllBooths';
 import { useView } from '../context/ViewContext';
 import { sortBooths } from '../helperFns/sortBooths';
 
-function Home({ userId }) {
+function FavoriteBooths({ userId }) {
     const { data: boothData, isLoading, error } = useFavorites(userId);
     const { showPublisher } = useView();
 
@@ -43,8 +43,8 @@ function Home({ userId }) {
     );
 }
 
-Home.propTypes = {
+FavoriteBooths.propTypes = {
     userId: PropTypes.string.isRequired,
 };
 
-export default Home;
+export default FavoriteBooths;

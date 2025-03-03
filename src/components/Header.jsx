@@ -3,16 +3,27 @@ import Nav from './Nav';
 import { Link } from 'react-router-dom';
 import d20 from '../img/d20.png';
 import { useView } from '../context/ViewContext';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 function Header() {
     const { showPublisher, toggleView } = useView();
+    const [isSigningOut, setIsSigningOut] = useState(false);
 
-    const handleSignOut = async () => {
+    const handleSignOut = async (e) => {
+        e.preventDefault(); // Prevent any default behavior
+        if (isSigningOut) return; // Prevent double-taps
+
+        setIsSigningOut(true);
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
+            toast.success('Signed out successfully');
         } catch (error) {
             console.error('Error signing out:', error.message);
+            toast.error('Failed to sign out. Please try again.');
+        } finally {
+            setIsSigningOut(false);
         }
     };
 
@@ -36,9 +47,14 @@ function Header() {
                 <div className="flex md:mt-0 md:ml-4 gap-4">
                     <button
                         onClick={handleSignOut}
-                        className="inline-flex items-center px-2 py-1 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                        disabled={isSigningOut}
+                        className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+                            ${isSigningOut ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'} 
+                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500
+                            touch-manipulation`}
+                        style={{ minHeight: '44px', minWidth: '44px' }}
                     >
-                        Sign Out
+                        {isSigningOut ? 'Signing Out...' : 'Sign Out'}
                     </button>
                 </div>
             </div>

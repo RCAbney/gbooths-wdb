@@ -88,7 +88,7 @@ function Booth({ title, userId }) {
                             {title.availability} - {title.msrp === 'N/A' ? 'N/A' : `$${title.msrp}`}
                         </p>
                     </div>
-                    <div className="ml-2 flex-shrink-0 flex">
+                    <div className="ml-2 shrink-0 flex">
                         <button
                             onClick={handleVisitedToggle}
                             disabled={isLoading}

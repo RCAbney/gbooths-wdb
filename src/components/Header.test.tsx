@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../test/test-utils';
 import Header from './Header';
+import FilterSheet from './FilterSheet';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-toastify';
 
@@ -52,6 +53,25 @@ describe('Header', () => {
         await user.click(toggleButton);
 
         expect(screen.getByRole('button', { name: 'Location' })).toBeInTheDocument();
+    });
+
+    it('opens the filter sheet when the filter button is clicked', async () => {
+        const user = userEvent.setup();
+        renderWithProviders(
+            <>
+                <Header />
+                <FilterSheet
+                    availableTypes={['Standalone']}
+                    availableAvailabilities={['For Sale']}
+                />
+            </>
+        );
+
+        expect(screen.queryByText('Filters')).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: 'Filter booths' }));
+
+        expect(screen.getByText('Filters')).toBeInTheDocument();
     });
 
     it('signs out, shows a success toast, and navigates home on success', async () => {

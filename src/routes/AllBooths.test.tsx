@@ -26,9 +26,20 @@ const publisherGroups: PublisherGroup[] = [
             {
                 id: 'b1',
                 title: 'Wingspan',
+                type: 'Standalone',
                 availability: 'In Stock',
                 msrp: '60',
                 bgg_id: '266192',
+                isFavorite: false,
+                is_visited: false,
+            },
+            {
+                id: 'b2',
+                title: 'Wyrmspan',
+                type: 'Expansion',
+                availability: 'In Stock',
+                msrp: '40',
+                bgg_id: '397043',
                 isFavorite: false,
                 is_visited: false,
             },
@@ -39,6 +50,7 @@ const publisherGroups: PublisherGroup[] = [
 describe('AllBooths', () => {
     beforeEach(() => {
         mockUseGetAllBooths.mockReset();
+        localStorage.clear();
     });
 
     it('renders Loading while the query is pending', () => {
@@ -79,5 +91,46 @@ describe('AllBooths', () => {
             'href',
             'https://boardgamegeek.com/boardgame/266192'
         );
+    });
+
+    it('hides booths matching an excluded type', () => {
+        localStorage.setItem(
+            'booth-filters',
+            JSON.stringify({
+                excludedTypes: ['Expansion'],
+                excludedAvailabilities: [],
+                hideVisited: false,
+            })
+        );
+        mockUseGetAllBooths.mockReturnValue({
+            isLoading: false,
+            error: null,
+            data: publisherGroups,
+        } as never);
+
+        renderWithProviders(<AllBooths userId="user-1" />);
+
+        expect(screen.getByRole('link', { name: 'Wingspan' })).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Wyrmspan' })).not.toBeInTheDocument();
+    });
+
+    it('shows a "no booths match" message when the filter excludes everything', () => {
+        localStorage.setItem(
+            'booth-filters',
+            JSON.stringify({
+                excludedTypes: ['Standalone', 'Expansion'],
+                excludedAvailabilities: [],
+                hideVisited: false,
+            })
+        );
+        mockUseGetAllBooths.mockReturnValue({
+            isLoading: false,
+            error: null,
+            data: publisherGroups,
+        } as never);
+
+        renderWithProviders(<AllBooths userId="user-1" />);
+
+        expect(screen.getByText('No booths match your filters.')).toBeInTheDocument();
     });
 });

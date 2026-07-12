@@ -217,6 +217,7 @@ describe('useAddIsVisited', () => {
                     {
                         id: 'b1',
                         title: 'Machi Koro: Life',
+                        type: 'Standalone',
                         availability: 'For Sale',
                         msrp: '30',
                         bgg_id: '421611',
@@ -232,6 +233,7 @@ describe('useAddIsVisited', () => {
                     {
                         id: 'b2',
                         title: 'Machi Koro: Life',
+                        type: 'Standalone',
                         availability: 'For Sale',
                         msrp: '30',
                         bgg_id: '999999',
@@ -288,6 +290,7 @@ describe('useAddIsVisited', () => {
                     {
                         id: 'b1',
                         title: 'Wingspan',
+                        type: 'Standalone',
                         availability: 'In Stock',
                         msrp: '60',
                         bgg_id: '266192',

@@ -19,6 +19,7 @@ vi.mock('../queryHooks/useGetAllBooths', () => ({
 const baseTitle: BoothTitle = {
     id: 'booth-1',
     title: 'Wingspan',
+    type: 'Standalone',
     bgg_id: '266192',
     availability: 'In Stock',
     msrp: '60',

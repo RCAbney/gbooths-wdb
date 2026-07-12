@@ -2,11 +2,14 @@ import { supabase } from '../lib/supabase';
 import { Link, useNavigate } from 'react-router-dom';
 import d20 from '../img/d20.png';
 import { useView } from '../hooks/useView';
+import { useFilters } from '../hooks/useFilters';
+import { FunnelIcon } from '@heroicons/react/24/outline';
 import { useState, type MouseEvent } from 'react';
 import { toast } from 'react-toastify';
 
 function Header() {
     const { showPublisher, toggleView } = useView();
+    const { openFilterSheet } = useFilters();
     const [isSigningOut, setIsSigningOut] = useState(false);
     const navigate = useNavigate();
 
@@ -77,12 +80,21 @@ function Header() {
                 </div>
             </div>
             <div className="flex items-center justify-between bg-black p-4">
-                <button
-                    onClick={toggleView}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
-                >
-                    {showPublisher ? 'Publisher' : 'Location'}
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={toggleView}
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                    >
+                        {showPublisher ? 'Publisher' : 'Location'}
+                    </button>
+                    <button
+                        onClick={openFilterSheet}
+                        aria-label="Filter booths"
+                        className="inline-flex items-center p-2 border border-transparent rounded-md shadow-xs text-white bg-gray-600 hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                    >
+                        <FunnelIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                </div>
                 <div className="flex items-center justify-around sm:justify-end gap-4">
                     <Link
                         to="/"

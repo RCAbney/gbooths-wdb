@@ -23,6 +23,7 @@ const publisherGroups: PublisherGroup[] = [
             {
                 id: 'b1',
                 title: 'Wingspan',
+                type: 'Standalone',
                 availability: 'In Stock',
                 msrp: '60',
                 bgg_id: '266192',
@@ -36,6 +37,7 @@ const publisherGroups: PublisherGroup[] = [
 describe('FavoriteBooths', () => {
     beforeEach(() => {
         mockUseFavorites.mockReset();
+        localStorage.clear();
     });
 
     it('renders Loading while the query is pending', () => {
@@ -121,5 +123,39 @@ describe('FavoriteBooths', () => {
         renderWithProviders(<FavoriteBooths userId="user-1" />);
 
         expect(screen.queryByText(/visited$/)).not.toBeInTheDocument();
+    });
+
+    it('hides visited booths from the list when hideVisited is set, but keeps the true count', () => {
+        const mixedGroups: PublisherGroup[] = [
+            {
+                publisher: 'Stonemaier',
+                location: '101',
+                titles: [
+                    { ...publisherGroups[0].titles[0], id: 'b1', is_visited: true },
+                    {
+                        ...publisherGroups[0].titles[0],
+                        id: 'b2',
+                        title: 'Wyrmspan',
+                        is_visited: false,
+                    },
+                ],
+            },
+        ];
+        localStorage.setItem(
+            'booth-filters',
+            JSON.stringify({ excludedTypes: [], excludedAvailabilities: [], hideVisited: true })
+        );
+        mockUseFavorites.mockReturnValue({
+            isLoading: false,
+            error: null,
+            data: mixedGroups,
+        } as never);
+
+        renderWithProviders(<FavoriteBooths userId="user-1" />);
+
+        // counter still reflects true progress across all favorites, not the filtered view
+        expect(screen.getByText('1 of 2 visited')).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Wingspan' })).not.toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Wyrmspan' })).toBeInTheDocument();
     });
 });

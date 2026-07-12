@@ -47,7 +47,7 @@ function Header() {
     };
 
     return (
-        <header className="bg-white shadow-sm sticky top-0">
+        <header className="bg-white shadow-xs sticky top-0">
             <div className="flex items-center justify-between bg-black p-4">
                 <div className="flex-1 min-w-0">
                     <h2 className="text-xl font-bold leading-7 text-white sm:truncate">
@@ -67,9 +67,9 @@ function Header() {
                     <button
                         onClick={handleSignOut}
                         disabled={isSigningOut}
-                        className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
+                        className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white 
                             ${isSigningOut ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'} 
-                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500
+                            focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500
                             touch-manipulation`}
                         style={{ minHeight: '44px', minWidth: '44px' }}
                     >
@@ -80,20 +80,20 @@ function Header() {
             <div className="flex items-center justify-between bg-black p-4">
                 <button
                     onClick={toggleView}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
                 >
                     {showPublisher ? 'Publisher' : 'Location'}
                 </button>
                 <div className="flex items-center justify-around sm:justify-end gap-4">
                     <Link
                         to="/"
-                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
                     >
                         View All
                     </Link>
                     <Link
                         to="/favorite-booths"
-                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
                     >
                         My Booths
                     </Link>

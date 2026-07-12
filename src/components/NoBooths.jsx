@@ -6,7 +6,7 @@ function NoBooths() {
         <div className="p-4 flex items-center justify-center h-[calc(100vh-70px)]">
             <Link
                 to="/"
-                className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 touch-manipulation active:bg-gray-50"
+                className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 touch-manipulation active:bg-gray-50"
                 style={{ minHeight: '44px', WebkitTapHighlightColor: 'transparent' }}
             >
                 <svg

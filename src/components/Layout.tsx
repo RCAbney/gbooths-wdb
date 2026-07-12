@@ -1,7 +1,7 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 import Header from './Header';
 
-function Layout({ children }) {
+function Layout({ children }: { children: ReactNode }) {
     return (
         <div>
             <Header />

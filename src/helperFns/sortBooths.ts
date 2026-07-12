@@ -1,5 +1,10 @@
-export const sortBooths = (boothData, showPublisher) => {
-    const getNumericPart = (location) => {
+import type { PublisherGroup } from '../types/booth';
+
+export const sortBooths = (
+    boothData: PublisherGroup[] | undefined,
+    showPublisher: boolean
+): PublisherGroup[] => {
+    const getNumericPart = (location: string | null) => {
         if (!location) return Number.MAX_VALUE; // Handle undefined locations
         const match = location.match(/^\d+/);
         return match ? parseInt(match[0], 10) : Number.MAX_VALUE;

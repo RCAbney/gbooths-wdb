@@ -9,9 +9,14 @@ import {
     useAddIsVisited,
     useRemoveIsVisited,
 } from '../queryHooks/useGetAllBooths';
-import PropTypes from 'prop-types';
+import type { BoothTitle } from '../types/booth';
 
-function Booth({ title, userId }) {
+interface BoothProps {
+    title: BoothTitle;
+    userId: string;
+}
+
+function Booth({ title, userId }: BoothProps) {
     const addToFavorites = useAddToFavorites();
     const removeFromFavorites = useRemoveFromFavorites();
     const addIsVisited = useAddIsVisited();
@@ -118,18 +123,5 @@ function Booth({ title, userId }) {
         </li>
     );
 }
-
-Booth.propTypes = {
-    title: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        bgg_id: PropTypes.string.isRequired,
-        availability: PropTypes.string.isRequired,
-        msrp: PropTypes.string.isRequired,
-        isFavorite: PropTypes.bool,
-        is_visited: PropTypes.bool,
-    }).isRequired,
-    userId: PropTypes.string.isRequired,
-};
 
 export default Booth;

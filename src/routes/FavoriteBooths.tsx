@@ -1,16 +1,18 @@
-import PropTypes from 'prop-types';
 import Layout from '../components/Layout';
 import Booth from '../components/Booth';
 import NoBooths from '../components/NoBooths';
 import Loading from '../components/Loading';
 import { useFavorites } from '../queryHooks/useGetAllBooths';
-import { ViewContext } from '../context/ViewContext';
 import { sortBooths } from '../helperFns/sortBooths';
-import { useContext } from 'react';
+import { useView } from '../hooks/useView';
 
-function FavoriteBooths({ userId }) {
+interface FavoriteBoothsProps {
+    userId: string;
+}
+
+function FavoriteBooths({ userId }: FavoriteBoothsProps) {
     const { data: boothData, isLoading, error } = useFavorites(userId);
-    const { showPublisher } = useContext(ViewContext);
+    const { showPublisher } = useView();
 
     if (isLoading) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;
@@ -43,9 +45,5 @@ function FavoriteBooths({ userId }) {
         </Layout>
     );
 }
-
-FavoriteBooths.propTypes = {
-    userId: PropTypes.string.isRequired,
-};
 
 export default FavoriteBooths;

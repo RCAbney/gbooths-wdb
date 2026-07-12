@@ -1,10 +1,14 @@
-import { createContext, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { createContext, useState, useEffect, type ReactNode } from 'react';
 
-const ViewContext = createContext();
+export interface ViewContextValue {
+    showPublisher: boolean;
+    toggleView: () => void;
+}
 
-export function ViewProvider({ children }) {
-    const [showPublisher, setShowPublisher] = useState(() => {
+const ViewContext = createContext<ViewContextValue | undefined>(undefined);
+
+export function ViewProvider({ children }: { children: ReactNode }) {
+    const [showPublisher, setShowPublisher] = useState<boolean>(() => {
         // Get initial state from localStorage or default to true
         const saved = localStorage.getItem('view-preference');
         return saved !== null ? JSON.parse(saved) : true;
@@ -25,9 +29,5 @@ export function ViewProvider({ children }) {
         </ViewContext.Provider>
     );
 }
-
-ViewProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-};
 
 export { ViewContext };

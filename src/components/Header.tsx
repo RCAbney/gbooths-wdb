@@ -1,17 +1,16 @@
 import { supabase } from '../lib/supabase';
-import Nav from './Nav';
 import { Link, useNavigate } from 'react-router-dom';
 import d20 from '../img/d20.png';
-import { ViewContext } from '../context/ViewContext';
-import { useState, useContext } from 'react';
+import { useView } from '../hooks/useView';
+import { useState, type MouseEvent } from 'react';
 import { toast } from 'react-toastify';
 
 function Header() {
-    const { showPublisher, toggleView } = useContext(ViewContext);
+    const { showPublisher, toggleView } = useView();
     const [isSigningOut, setIsSigningOut] = useState(false);
     const navigate = useNavigate();
 
-    const handleSignOut = async (e) => {
+    const handleSignOut = async (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault(); // Prevent any default behavior
         if (isSigningOut) return; // Prevent double-taps
 

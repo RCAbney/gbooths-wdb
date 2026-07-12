@@ -1,15 +1,17 @@
-import PropTypes from 'prop-types';
 import Layout from '../components/Layout';
 import Booth from '../components/Booth';
 import Loading from '../components/Loading';
 import { useGetAllBooths } from '../queryHooks/useGetAllBooths';
-import { ViewContext } from '../context/ViewContext';
 import { sortBooths } from '../helperFns/sortBooths';
-import { useContext } from 'react';
+import { useView } from '../hooks/useView';
 
-function AllBooths({ userId }) {
+interface AllBoothsProps {
+    userId: string;
+}
+
+function AllBooths({ userId }: AllBoothsProps) {
     const { data: boothData, isLoading, error } = useGetAllBooths(userId);
-    const { showPublisher } = useContext(ViewContext);
+    const { showPublisher } = useView();
 
     if (isLoading) return <Loading />;
     if (error) return <div>Error: {error.message}</div>;
@@ -38,9 +40,5 @@ function AllBooths({ userId }) {
         </Layout>
     );
 }
-
-AllBooths.propTypes = {
-    userId: PropTypes.string.isRequired,
-};
 
 export default AllBooths;

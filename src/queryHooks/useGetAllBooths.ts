@@ -1,13 +1,48 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { supabase } from '../lib/supabase';
+import type { BoothTitle, PublisherGroup } from '../types/booth';
 
-const fetchBooths = async (userId) => {
+interface BoothRow {
+    id: string;
+    title: string;
+    publisher: string;
+    location: string | null;
+    availability: string;
+    msrp: string;
+    bgg_id: string;
+}
+
+interface FavoriteIdRow {
+    booth_id: string;
+    is_visited: boolean;
+}
+
+interface FavoriteWithBoothRow {
+    booths: BoothRow;
+    is_visited: boolean;
+}
+
+interface MutationVariables {
+    userId: string;
+    boothId: string;
+    title: string;
+}
+
+interface MutationContext {
+    previousBooths: PublisherGroup[] | undefined;
+    previousFavorites: PublisherGroup[] | undefined;
+    boothsKey: [string, string];
+    favoritesKey: [string, string];
+}
+
+const fetchBooths = async (userId: string): Promise<PublisherGroup[]> => {
     // First get all booths
     const { data: booths, error: boothsError } = await supabase
         .from('booths')
         .select('id, title, publisher, location, availability, msrp, bgg_id')
-        .order('publisher', { ascending: true });
+        .order('publisher', { ascending: true })
+        .returns<BoothRow[]>();
 
     if (boothsError) throw new Error(boothsError.message);
 
@@ -15,7 +50,8 @@ const fetchBooths = async (userId) => {
     const { data: favorites, error: favoritesError } = await supabase
         .from('favorites')
         .select('booth_id, is_visited')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .returns<FavoriteIdRow[]>();
 
     if (favoritesError) throw new Error(favoritesError.message);
 
@@ -24,7 +60,7 @@ const fetchBooths = async (userId) => {
     const visitedStatus = new Map(favorites?.map((f) => [f.booth_id, f.is_visited]) || []);
 
     // Group by publisher and include isFavorite and is_visited flags
-    const groupedByPublisher = booths.reduce((acc, booth) => {
+    const groupedByPublisher = booths.reduce<Record<string, PublisherGroup>>((acc, booth) => {
         const { id, publisher, location, title, availability, msrp, bgg_id } = booth;
         if (!acc[publisher]) {
             acc[publisher] = {
@@ -48,7 +84,7 @@ const fetchBooths = async (userId) => {
     return Object.values(groupedByPublisher);
 };
 
-export const useGetAllBooths = (userId) => {
+export const useGetAllBooths = (userId: string) => {
     return useQuery({
         queryKey: ['booths', userId],
         queryFn: () => fetchBooths(userId),
@@ -57,16 +93,17 @@ export const useGetAllBooths = (userId) => {
     });
 };
 
-const fetchFavorites = async (userId) => {
+const fetchFavorites = async (userId: string): Promise<PublisherGroup[]> => {
     const { data, error } = await supabase
         .from('favorites')
         .select('booths(title, publisher, location, availability, msrp, bgg_id, id), is_visited')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .returns<FavoriteWithBoothRow[]>();
 
     if (error) throw new Error(error.message);
 
     // Group by publisher
-    const groupedByPublisher = data.reduce((acc, fav) => {
+    const groupedByPublisher = data.reduce<Record<string, PublisherGroup>>((acc, fav) => {
         const { publisher, location, title, availability, msrp, bgg_id, id } = fav.booths;
         if (!acc[publisher]) {
             acc[publisher] = {
@@ -95,7 +132,7 @@ const fetchFavorites = async (userId) => {
     return Object.values(groupedByPublisher);
 };
 
-export const useFavorites = (userId) => {
+export const useFavorites = (userId: string) => {
     return useQuery({
         queryKey: ['favorites', userId],
         queryFn: () => fetchFavorites(userId),
@@ -103,7 +140,7 @@ export const useFavorites = (userId) => {
     });
 };
 
-const addIsVisited = async ({ userId, boothId, title }) => {
+const addIsVisited = async ({ userId, boothId, title }: MutationVariables) => {
     const { error } = await supabase
         .from('favorites')
         .upsert(
@@ -131,21 +168,21 @@ export const useAddIsVisited = () => {
 
     return useMutation({
         mutationFn: addIsVisited,
-        onMutate: async ({ userId, title }) => {
-            const boothsKey = ['booths', userId];
-            const favoritesKey = ['favorites', userId];
+        onMutate: async ({ userId, title }): Promise<MutationContext> => {
+            const boothsKey: [string, string] = ['booths', userId];
+            const favoritesKey: [string, string] = ['favorites', userId];
 
             await queryClient.cancelQueries({ queryKey: boothsKey });
             await queryClient.cancelQueries({ queryKey: favoritesKey });
 
-            const previousBooths = queryClient.getQueryData(boothsKey);
-            const previousFavorites = queryClient.getQueryData(favoritesKey);
+            const previousBooths = queryClient.getQueryData<PublisherGroup[]>(boothsKey);
+            const previousFavorites = queryClient.getQueryData<PublisherGroup[]>(favoritesKey);
 
-            queryClient.setQueryData(boothsKey, (old) => {
+            queryClient.setQueryData<PublisherGroup[]>(boothsKey, (old) => {
                 if (!old) return old;
                 return old.map((publisher) => ({
                     ...publisher,
-                    titles: publisher.titles.map((booth) => {
+                    titles: publisher.titles.map((booth): BoothTitle => {
                         if (booth.title === title) {
                             return {
                                 ...booth,
@@ -160,7 +197,7 @@ export const useAddIsVisited = () => {
 
             return { previousBooths, previousFavorites, boothsKey, favoritesKey };
         },
-        onError: (err, variables, context) => {
+        onError: (err, _variables, context) => {
             if (context?.previousBooths) {
                 queryClient.setQueryData(context.boothsKey, context.previousBooths);
             }
@@ -178,14 +215,14 @@ export const useAddIsVisited = () => {
                 autoClose: 750,
             });
         },
-        onSettled: (data, error, { userId }) => {
-            queryClient.invalidateQueries(['booths', userId]);
-            queryClient.invalidateQueries(['favorites', userId]);
+        onSettled: (_data, _error, { userId }) => {
+            queryClient.invalidateQueries({ queryKey: ['booths', userId] });
+            queryClient.invalidateQueries({ queryKey: ['favorites', userId] });
         },
     });
 };
 
-const removeIsVisited = async ({ userId, boothId, title }) => {
+const removeIsVisited = async ({ userId, boothId, title }: MutationVariables) => {
     const { error } = await supabase
         .from('favorites')
         .upsert(
@@ -213,21 +250,21 @@ export const useRemoveIsVisited = () => {
 
     return useMutation({
         mutationFn: removeIsVisited,
-        onMutate: async ({ userId, title }) => {
-            const boothsKey = ['booths', userId];
-            const favoritesKey = ['favorites', userId];
+        onMutate: async ({ userId, title }): Promise<MutationContext> => {
+            const boothsKey: [string, string] = ['booths', userId];
+            const favoritesKey: [string, string] = ['favorites', userId];
 
             await queryClient.cancelQueries({ queryKey: boothsKey });
             await queryClient.cancelQueries({ queryKey: favoritesKey });
 
-            const previousBooths = queryClient.getQueryData(boothsKey);
-            const previousFavorites = queryClient.getQueryData(favoritesKey);
+            const previousBooths = queryClient.getQueryData<PublisherGroup[]>(boothsKey);
+            const previousFavorites = queryClient.getQueryData<PublisherGroup[]>(favoritesKey);
 
-            queryClient.setQueryData(boothsKey, (old) => {
+            queryClient.setQueryData<PublisherGroup[]>(boothsKey, (old) => {
                 if (!old) return old;
                 return old.map((publisher) => ({
                     ...publisher,
-                    titles: publisher.titles.map((booth) => {
+                    titles: publisher.titles.map((booth): BoothTitle => {
                         if (booth.title === title) {
                             return {
                                 ...booth,
@@ -242,7 +279,7 @@ export const useRemoveIsVisited = () => {
 
             return { previousBooths, previousFavorites, boothsKey, favoritesKey };
         },
-        onError: (err, variables, context) => {
+        onError: (err, _variables, context) => {
             if (context?.previousBooths) {
                 queryClient.setQueryData(context.boothsKey, context.previousBooths);
             }
@@ -260,14 +297,14 @@ export const useRemoveIsVisited = () => {
                 autoClose: 750,
             });
         },
-        onSettled: (data, error, { userId }) => {
-            queryClient.invalidateQueries(['booths', userId]);
-            queryClient.invalidateQueries(['favorites', userId]);
+        onSettled: (_data, _error, { userId }) => {
+            queryClient.invalidateQueries({ queryKey: ['booths', userId] });
+            queryClient.invalidateQueries({ queryKey: ['favorites', userId] });
         },
     });
 };
 
-const addToFavorites = async ({ userId, boothId, title }) => {
+const addToFavorites = async ({ userId, boothId, title }: MutationVariables) => {
     const { error } = await supabase
         .from('favorites')
         .insert([{ user_id: userId, booth_id: boothId, is_visited: false }]);
@@ -282,8 +319,8 @@ export const useAddToFavorites = () => {
     return useMutation({
         mutationFn: addToFavorites,
         onSuccess: (title) => {
-            queryClient.invalidateQueries(['favorites']);
-            queryClient.invalidateQueries(['booths']);
+            queryClient.invalidateQueries({ queryKey: ['favorites'] });
+            queryClient.invalidateQueries({ queryKey: ['booths'] });
             toast.success(`Added "${title}" to favorites!`, {
                 position: 'top-center',
                 autoClose: 750,
@@ -302,7 +339,7 @@ export const useAddToFavorites = () => {
     });
 };
 
-const removeFromFavorites = async ({ userId, boothId, title }) => {
+const removeFromFavorites = async ({ userId, boothId, title }: MutationVariables) => {
     const { error } = await supabase
         .from('favorites')
         .delete()
@@ -319,8 +356,8 @@ export const useRemoveFromFavorites = () => {
     return useMutation({
         mutationFn: removeFromFavorites,
         onSuccess: (title) => {
-            queryClient.invalidateQueries(['favorites']);
-            queryClient.invalidateQueries(['booths']);
+            queryClient.invalidateQueries({ queryKey: ['favorites'] });
+            queryClient.invalidateQueries({ queryKey: ['booths'] });
             toast.success(`Removed "${title}" from favorites`, {
                 position: 'top-center',
                 autoClose: 750,

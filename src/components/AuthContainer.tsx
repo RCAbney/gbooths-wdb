@@ -1,12 +1,12 @@
 import { supabase } from '../lib/supabase';
 import d20 from '../img/d20.png';
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 
 function AuthContainer() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
 
-    const handleMagicLinkSignIn = async (e) => {
+    const handleMagicLinkSignIn = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             const { error } = await supabase.auth.signInWithOtp({
@@ -19,7 +19,7 @@ function AuthContainer() {
             if (error) throw error;
             setMessage('Check your email for the magic link!');
         } catch (error) {
-            setMessage(error.message);
+            setMessage(error instanceof Error ? error.message : 'An unexpected error occurred');
         }
     };
 

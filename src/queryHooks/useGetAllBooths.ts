@@ -168,7 +168,7 @@ export const useAddIsVisited = () => {
 
     return useMutation({
         mutationFn: addIsVisited,
-        onMutate: async ({ userId, title }): Promise<MutationContext> => {
+        onMutate: async ({ userId, boothId }): Promise<MutationContext> => {
             const boothsKey: [string, string] = ['booths', userId];
             const favoritesKey: [string, string] = ['favorites', userId];
 
@@ -183,7 +183,7 @@ export const useAddIsVisited = () => {
                 return old.map((publisher) => ({
                     ...publisher,
                     titles: publisher.titles.map((booth): BoothTitle => {
-                        if (booth.title === title) {
+                        if (booth.id === boothId) {
                             return {
                                 ...booth,
                                 is_visited: true,
@@ -250,7 +250,7 @@ export const useRemoveIsVisited = () => {
 
     return useMutation({
         mutationFn: removeIsVisited,
-        onMutate: async ({ userId, title }): Promise<MutationContext> => {
+        onMutate: async ({ userId, boothId }): Promise<MutationContext> => {
             const boothsKey: [string, string] = ['booths', userId];
             const favoritesKey: [string, string] = ['favorites', userId];
 
@@ -265,7 +265,7 @@ export const useRemoveIsVisited = () => {
                 return old.map((publisher) => ({
                     ...publisher,
                     titles: publisher.titles.map((booth): BoothTitle => {
-                        if (booth.title === title) {
+                        if (booth.id === boothId) {
                             return {
                                 ...booth,
                                 is_visited: false,

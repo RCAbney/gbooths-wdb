@@ -197,6 +197,65 @@ describe('useAddIsVisited', () => {
         );
     });
 
+    it('optimistically updates only the targeted booth when another booth shares its title', async () => {
+        // Regression test: onMutate used to match by title, which meant two
+        // booths with the same title (real scenario in this year's dataset,
+        // e.g. "Machi Koro: Life" listed twice under different publishers)
+        // would both flip to visited even though only one was toggled.
+        mockFrom.mockReturnValue(
+            createSupabaseQueryBuilder({
+                data: { title: 'Machi Koro: Life' },
+                error: null,
+            }) as never
+        );
+        const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+        const initialData: PublisherGroup[] = [
+            {
+                publisher: 'Pandasaurus Games',
+                location: 'Booth #215',
+                titles: [
+                    {
+                        id: 'b1',
+                        title: 'Machi Koro: Life',
+                        availability: 'For Sale',
+                        msrp: '30',
+                        bgg_id: '421611',
+                        isFavorite: false,
+                        is_visited: false,
+                    },
+                ],
+            },
+            {
+                publisher: 'Some Other Publisher',
+                location: null,
+                titles: [
+                    {
+                        id: 'b2',
+                        title: 'Machi Koro: Life',
+                        availability: 'For Sale',
+                        msrp: '30',
+                        bgg_id: '999999',
+                        isFavorite: false,
+                        is_visited: false,
+                    },
+                ],
+            },
+        ];
+        queryClient.setQueryData(['booths', 'user-1'], initialData);
+
+        const { result } = renderHook(() => useAddIsVisited(), {
+            wrapper: createQueryClientWrapper(queryClient),
+        });
+
+        result.current.mutate({ userId: 'user-1', boothId: 'b1', title: 'Machi Koro: Life' });
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+        const cached = queryClient.getQueryData<PublisherGroup[]>(['booths', 'user-1']);
+        expect(cached?.[0].titles[0].is_visited).toBe(true); // b1, the one actually toggled
+        expect(cached?.[1].titles[0].is_visited).toBe(false); // b2, same title, untouched
+    });
+
     it('optimistically marks the booth as visited, then rolls back on error', async () => {
         // Delay the rejection past a macrotask boundary -- otherwise onMutate's
         // optimistic write and onError's rollback both resolve within the same

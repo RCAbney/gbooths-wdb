@@ -1,6 +1,7 @@
 export interface BoothTitle {
     id: string;
     title: string;
+    type: string;
     bgg_id: string;
     availability: string;
     msrp: string;

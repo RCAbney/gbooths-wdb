@@ -6,6 +6,7 @@ import type { BoothTitle, PublisherGroup } from '../types/booth';
 interface BoothRow {
     id: string;
     title: string;
+    type: string;
     publisher: string;
     location: string | null;
     availability: string;
@@ -40,7 +41,7 @@ const fetchBooths = async (userId: string): Promise<PublisherGroup[]> => {
     // First get all booths
     const { data: booths, error: boothsError } = await supabase
         .from('booths')
-        .select('id, title, publisher, location, availability, msrp, bgg_id')
+        .select('id, title, type, publisher, location, availability, msrp, bgg_id')
         .order('publisher', { ascending: true })
         .returns<BoothRow[]>();
 
@@ -61,7 +62,7 @@ const fetchBooths = async (userId: string): Promise<PublisherGroup[]> => {
 
     // Group by publisher and include isFavorite and is_visited flags
     const groupedByPublisher = booths.reduce<Record<string, PublisherGroup>>((acc, booth) => {
-        const { id, publisher, location, title, availability, msrp, bgg_id } = booth;
+        const { id, publisher, location, title, type, availability, msrp, bgg_id } = booth;
         if (!acc[publisher]) {
             acc[publisher] = {
                 publisher,
@@ -72,6 +73,7 @@ const fetchBooths = async (userId: string): Promise<PublisherGroup[]> => {
         acc[publisher].titles.push({
             id,
             title,
+            type,
             availability,
             msrp,
             bgg_id,
@@ -96,7 +98,9 @@ export const useGetAllBooths = (userId: string) => {
 const fetchFavorites = async (userId: string): Promise<PublisherGroup[]> => {
     const { data, error } = await supabase
         .from('favorites')
-        .select('booths(title, publisher, location, availability, msrp, bgg_id, id), is_visited')
+        .select(
+            'booths(title, type, publisher, location, availability, msrp, bgg_id, id), is_visited'
+        )
         .eq('user_id', userId)
         .returns<FavoriteWithBoothRow[]>();
 
@@ -104,7 +108,7 @@ const fetchFavorites = async (userId: string): Promise<PublisherGroup[]> => {
 
     // Group by publisher
     const groupedByPublisher = data.reduce<Record<string, PublisherGroup>>((acc, fav) => {
-        const { publisher, location, title, availability, msrp, bgg_id, id } = fav.booths;
+        const { publisher, location, title, type, availability, msrp, bgg_id, id } = fav.booths;
         if (!acc[publisher]) {
             acc[publisher] = {
                 publisher,
@@ -114,6 +118,7 @@ const fetchFavorites = async (userId: string): Promise<PublisherGroup[]> => {
         }
         acc[publisher].titles.push({
             title,
+            type,
             availability,
             msrp,
             bgg_id,

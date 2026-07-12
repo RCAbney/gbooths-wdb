@@ -10,6 +10,7 @@ import FavoriteBooths from './routes/FavoriteBooths';
 import AllBooths from './routes/AllBooths';
 import AuthContainer from './components/AuthContainer';
 import { ViewProvider } from './context/ViewContext';
+import { FilterProvider } from './context/FilterContext';
 
 const queryClient = new QueryClient();
 
@@ -42,16 +43,18 @@ function App() {
             <QueryClientProvider client={queryClient}>
                 <ReactQueryDevtools initialIsOpen={false} />
                 <ViewProvider>
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<AllBooths userId={session.user.id} />} />
-                            <Route
-                                element={<FavoriteBooths userId={session.user.id} />}
-                                path="/favorite-booths"
-                            />
-                        </Routes>
-                    </BrowserRouter>
-                    <ToastContainer position="top-center" autoClose={750} />
+                    <FilterProvider>
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path="/" element={<AllBooths userId={session.user.id} />} />
+                                <Route
+                                    element={<FavoriteBooths userId={session.user.id} />}
+                                    path="/favorite-booths"
+                                />
+                            </Routes>
+                        </BrowserRouter>
+                        <ToastContainer position="top-center" autoClose={750} />
+                    </FilterProvider>
                 </ViewProvider>
             </QueryClientProvider>
         );

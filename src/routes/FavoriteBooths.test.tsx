@@ -87,4 +87,39 @@ describe('FavoriteBooths', () => {
             'https://boardgamegeek.com/boardgame/266192'
         );
     });
+
+    it('shows a visited count across all publisher groups', () => {
+        const mixedGroups: PublisherGroup[] = [
+            {
+                publisher: 'Stonemaier',
+                location: '101',
+                titles: [
+                    { ...publisherGroups[0].titles[0], id: 'b1', is_visited: true },
+                    { ...publisherGroups[0].titles[0], id: 'b2', is_visited: false },
+                ],
+            },
+            {
+                publisher: 'Weird City Games',
+                location: '200',
+                titles: [{ ...publisherGroups[0].titles[0], id: 'b3', is_visited: true }],
+            },
+        ];
+        mockUseFavorites.mockReturnValue({
+            isLoading: false,
+            error: null,
+            data: mixedGroups,
+        } as never);
+
+        renderWithProviders(<FavoriteBooths userId="user-1" />);
+
+        expect(screen.getByText('2 of 3 visited')).toBeInTheDocument();
+    });
+
+    it('does not show a visited count when there are no favorites', () => {
+        mockUseFavorites.mockReturnValue({ isLoading: false, error: null, data: [] } as never);
+
+        renderWithProviders(<FavoriteBooths userId="user-1" />);
+
+        expect(screen.queryByText(/visited$/)).not.toBeInTheDocument();
+    });
 });
